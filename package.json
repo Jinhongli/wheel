@@ -1,0 +1,20 @@
+{
+  "name": "wheel",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/Jinhongli/wheel.git",
+  "author": "Jinhongli <jhl211@163.com>",
+  "scripts": {
+    "test": "jest",
+    "exec": "babel-node promise/index.js"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": "^7.3.4",
+    "@babel/node": "^7.2.2",
+    "@babel/plugin-proposal-class-properties": "^7.3.4",
+    "@babel/preset-env": "^7.3.4",
+    "babel-jest": "^24.5.0",
+    "jest": "^24.5.0"
+  }
+}
