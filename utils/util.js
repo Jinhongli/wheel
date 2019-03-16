@@ -7,3 +7,6 @@ export const throwError = msg => {
 export const defer = fn => setTimeout(fn, 0);
 
 export const delay = (fn, ms = 1) => setTimeout(fn, ms);
+
+export const compose = (...fns) =>
+  fns.reduce((f, g) => (...args) => f(g(...args)));

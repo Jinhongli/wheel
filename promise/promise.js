@@ -1,4 +1,4 @@
-import { identity, throwError, defer } from '../utils/util';
+import { identity, throwError, defer, compose } from '../utils/util';
 import { isFn } from '../utils/type';
 
 const STATUS = {
@@ -8,8 +8,6 @@ const STATUS = {
 };
 
 const handlePromise = Symbol['handlePromise'];
-
-// TODO: 对返回值做判断
 
 class MyPromise {
   status = STATUS.PENDING;
@@ -27,7 +25,7 @@ class MyPromise {
   constructor(resolver) {
     if (!isFn(resolver)) throwError('resolver is not a function');
     const resolve = val => {
-      if (this.status === 'pending') {
+      if (!this.handled) {
         this.handled = true;
         this.status = STATUS.RESOLVED;
         this.value = val;
@@ -35,7 +33,7 @@ class MyPromise {
       }
     };
     const reject = reason => {
-      if (this.status === 'pending') {
+      if (!this.handled) {
         this.handled = true;
         this.status = STATUS.REJECTED;
         this.reason = reason;
@@ -51,10 +49,24 @@ class MyPromise {
 
   [handlePromise](resolve, reject, handler, value) {
     defer(() => {
-      try {
-        resolve(handler(value));
-      } catch (err) {
-        reject(err);
+      if (value && value.then) {
+        // 值是一个 Promise 对象
+        value.then(
+          compose(
+            resolve,
+            this.onFulfilled
+          ),
+          compose(
+            resolve,
+            this.onRejected
+          )
+        );
+      } else {
+        try {
+          resolve(handler(value));
+        } catch (err) {
+          reject(err);
+        }
       }
     });
   }
