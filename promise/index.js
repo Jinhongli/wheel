@@ -1,6 +1,6 @@
 import MyPromise from './promise';
 import { delay } from '../utils/util';
-import { log } from '../utils/log';
+import { log, error } from '../utils/log';
 
 log('Program Start');
 
@@ -17,9 +17,7 @@ new MyPromise((resolve, reject) => {
     );
   }, 1000);
 })
-  .then(log, err => {
-    log(`error: ${err}`);
-  })
+  .catch(error)
   .then(() => {
     log('finish');
   });

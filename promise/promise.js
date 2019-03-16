@@ -97,6 +97,10 @@ class MyPromise {
       }
     });
   }
+
+  catch(onRejected) {
+    return this.then(null, onRejected);
+  }
 }
 
 export default MyPromise;

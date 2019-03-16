@@ -1,13 +1,22 @@
 const chalk = require('chalk');
 
-export const log = (...args) => {
+const getTime = () => {
   const d = new Date();
-  const logTime = d.toLocaleTimeString() + `:${d.getMilliseconds()}`;
-  console.log(chalk.green(`[${logTime}]:`), ...args);
+  const localTime = d.toLocaleTimeString();
+  const ms = d.getMilliseconds();
+  if (ms < 10) return `${localTime}.00${ms}`;
+  if (ms < 100) return `${localTime}.0${ms}`;
+  return `${localTime}.${ms}`;
+};
+
+export const log = (...args) => {
+  console.log(chalk.yellow(`<${getTime()}>:`), '  [LOG] ', ...args);
 };
 
 export const error = (...args) => {
-  const d = new Date();
-  const logTime = d.toLocaleTimeString() + `:${d.getMilliseconds()}`;
-  console.log(`[${logTime}]:`, ...args);
+  console.log(
+    chalk.yellow(`<${getTime()}>:`),
+    chalk.red('[ERROR] '),
+    ...args.map(arg => chalk.red(arg))
+  );
 };
