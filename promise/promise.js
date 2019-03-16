@@ -41,6 +41,14 @@ class MyPromise {
     });
   };
 
+  static race = promises => {
+    return new MyPromise((resolve, reject) => {
+      promises.forEach(p => {
+        p.then(resolve, reject);
+      });
+    });
+  };
+
   status = STATUS.PENDING;
 
   handled = false;

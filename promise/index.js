@@ -5,6 +5,7 @@ import { log, error } from '../utils/log';
 const createRandomDelayPromise = () =>
   new MyPromise(resolve => {
     const int = randomInt(1, 5);
+    log(`create a ${int * 1000}ms Promise`);
     delay(() => {
       resolve(int);
     }, int * 1000);
@@ -19,11 +20,10 @@ const createFailPromise = () =>
 
 log('Program Start');
 
-MyPromise.all([
+MyPromise.race([
   createRandomDelayPromise(),
   createRandomDelayPromise(),
   createRandomDelayPromise(),
-  createFailPromise(),
 ])
   .then(log, error)
   .finally(() => {
