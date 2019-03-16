@@ -22,6 +22,25 @@ class MyPromise {
     });
   };
 
+  static all = promises => {
+    return new MyPromise((resolve, reject) => {
+      let count = 0;
+      let values = [];
+      const setValues = (index, value) => {
+        values[index] = value;
+        count++;
+        if (count >= promises.length) {
+          resolve(values);
+        }
+      };
+      promises.forEach((p, i) => {
+        p.then(val => {
+          setValues(i, val);
+        }, reject);
+      });
+    });
+  };
+
   status = STATUS.PENDING;
 
   handled = false;

@@ -1,21 +1,31 @@
 import MyPromise from './promise';
-import { delay, throwError } from '../utils/util';
+import { delay, randomInt } from '../utils/util';
 import { log, error } from '../utils/log';
+
+const createRandomDelayPromise = () =>
+  new MyPromise(resolve => {
+    const int = randomInt(1, 5);
+    delay(() => {
+      resolve(int);
+    }, int * 1000);
+  });
+
+const createFailPromise = () =>
+  new MyPromise((resolve, reject) => {
+    delay(() => {
+      reject('fail');
+    }, 500);
+  });
 
 log('Program Start');
 
-new MyPromise((resolve, reject) => {
-  delay(() => {
-    resolve('foo');
-  }, 1000);
-})
-  .then(v => {
-    log('1s later', v);
-    return new MyPromise((resolve, reject) => {
-      reject('bar');
-    });
-  })
+MyPromise.all([
+  createRandomDelayPromise(),
+  createRandomDelayPromise(),
+  createRandomDelayPromise(),
+  createFailPromise(),
+])
+  .then(log, error)
   .finally(() => {
-    log('finish');
-  })
-  .then(log, error);
+    log('finally finish');
+  });
