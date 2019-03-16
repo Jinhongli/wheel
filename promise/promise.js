@@ -7,7 +7,7 @@ const STATUS = {
   REJECTED: 'rejected',
 };
 
-const handlePromise = Symbol['handlePromise'];
+const handleCallback = Symbol['handleCallback'];
 
 class MyPromise {
   static resolve = value => {
@@ -41,7 +41,18 @@ class MyPromise {
         this.handled = true;
         this.status = STATUS.RESOLVED;
         this.value = val;
-        if (this.onFulfilled) this.onFulfilled(val);
+        if (val && val.then) {
+          val.then(
+            v => {
+              if (this.onFulfilled) this.onFulfilled(v);
+            },
+            e => {
+              if (this.onRejected) this.onRejected(e);
+            }
+          );
+        } else {
+          if (this.onFulfilled) this.onFulfilled(val);
+        }
       }
     };
     const reject = reason => {
@@ -49,7 +60,18 @@ class MyPromise {
         this.handled = true;
         this.status = STATUS.REJECTED;
         this.reason = reason;
-        if (this.onRejected) this.onRejected(reason);
+        if (reason && reason.then) {
+          reason.then(
+            v => {
+              if (this.onFulfilled) this.onFulfilled(v);
+            },
+            e => {
+              if (this.onRejected) this.onRejected(e);
+            }
+          );
+        } else {
+          if (this.onRejected) this.onRejected(reason);
+        }
       }
     };
     try {
@@ -59,26 +81,13 @@ class MyPromise {
     }
   }
 
-  [handlePromise](resolve, reject, handler, value) {
+  [handleCallback](resolve, reject, handler, value) {
     defer(() => {
-      if (value && value.then) {
-        // 值是一个 Promise 对象
-        value.then(
-          compose(
-            resolve,
-            this.onFulfilled
-          ),
-          compose(
-            resolve,
-            this.onRejected
-          )
-        );
-      } else {
-        try {
-          resolve(handler(value));
-        } catch (err) {
-          reject(err);
-        }
+      try {
+        const x = handler(value);
+        resolve(x);
+      } catch (err) {
+        reject(err);
       }
     });
   }
@@ -87,19 +96,19 @@ class MyPromise {
     return new MyPromise((resolve, reject) => {
       switch (this.status) {
         case STATUS.RESOLVED:
-          this[handlePromise](resolve, reject, onFulfilled, this.value);
+          this[handleCallback](resolve, reject, onFulfilled, this.value);
           break;
         case STATUS.REJECTED:
-          this[handlePromise](resolve, reject, onRejected, this.reason);
+          this[handleCallback](resolve, reject, onRejected, this.reason);
         default:
           // Async
-          this.onFulfilled = this[handlePromise].bind(
+          this.onFulfilled = this[handleCallback].bind(
             this,
             resolve,
             reject,
             onFulfilled
           );
-          this.onRejected = this[handlePromise].bind(
+          this.onRejected = this[handleCallback].bind(
             this,
             resolve,
             reject,

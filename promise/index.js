@@ -4,17 +4,17 @@ import { log, error } from '../utils/log';
 
 log('Program Start');
 
-Promise.reject('foo')
-  .then(
-    v => {
-      log(v);
-      return v;
-    },
-    e => {
-      error(e);
-      throwError(e);
-    }
-  )
+new MyPromise((resolve, reject) => {
+  delay(() => {
+    resolve('foo');
+  }, 1000);
+})
+  .then(v => {
+    log('1s later', v);
+    return new MyPromise((resolve, reject) => {
+      reject('bar');
+    });
+  })
   .finally(() => {
     log('finish');
   })
