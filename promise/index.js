@@ -4,12 +4,7 @@ import { log, error } from '../utils/log';
 
 log('Program Start');
 
-new MyPromise((resolve, reject) => {
-  delay(() => {
-    log('1s later');
-    resolve('foo');
-  }, 1000);
-})
+Promise.reject('foo')
   .then(
     v => {
       log(v);

@@ -10,6 +10,18 @@ const STATUS = {
 const handlePromise = Symbol['handlePromise'];
 
 class MyPromise {
+  static resolve = value => {
+    return new MyPromise(resolve => {
+      resolve(value);
+    });
+  };
+
+  static reject = reason => {
+    return new MyPromise((resolve, reject) => {
+      reject(reason);
+    });
+  };
+
   status = STATUS.PENDING;
 
   handled = false;
