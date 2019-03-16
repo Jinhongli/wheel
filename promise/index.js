@@ -1,5 +1,5 @@
 import MyPromise from './promise';
-import { delay } from '../utils/util';
+import { delay, throwError } from '../utils/util';
 import { log, error } from '../utils/log';
 
 log('Program Start');
@@ -7,17 +7,20 @@ log('Program Start');
 new MyPromise((resolve, reject) => {
   delay(() => {
     log('1s later');
-    reject(
-      new MyPromise((resolve, reject) => {
-        delay(() => {
-          log('1s later');
-          reject('foo');
-        }, 1000);
-      })
-    );
+    resolve('foo');
   }, 1000);
 })
-  .catch(error)
-  .then(() => {
+  .then(
+    v => {
+      log(v);
+      return v;
+    },
+    e => {
+      error(e);
+      throwError(e);
+    }
+  )
+  .finally(() => {
     log('finish');
-  });
+  })
+  .then(log, error);

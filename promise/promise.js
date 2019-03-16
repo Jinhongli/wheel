@@ -101,6 +101,29 @@ class MyPromise {
   catch(onRejected) {
     return this.then(null, onRejected);
   }
+
+  finally(onFinally) {
+    return this.then(
+      val => {
+        try {
+          onFinally();
+        } catch (error) {
+          throwError(error);
+        }
+        return val;
+      },
+      err => {
+        let onFinallyHasErr = false;
+        try {
+          onFinally();
+        } catch (error) {
+          onFinallyHasErr = true;
+          throwError(error);
+        }
+        if (!onFinallyHasErr) throwError(err);
+      }
+    );
+  }
 }
 
 export default MyPromise;
