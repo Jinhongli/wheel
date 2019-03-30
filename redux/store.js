@@ -1,11 +1,13 @@
+import applyMiddleware from './applyMiddleware';
+
 const INIT_ACTION = {
   type: '@@INIT_STORE@@',
 };
 
-const createStore = (reducer, initialState) => {
-  let state = initialState || reducer(undefined, INIT_ACTION);
+const createStore = (reducer, preloadedState, middlewares) => {
+  let state = preloadedState || reducer(undefined, INIT_ACTION);
   let listeners = [];
-  return {
+  const store = {
     getState() {
       return state;
     },
@@ -20,6 +22,9 @@ const createStore = (reducer, initialState) => {
       };
     },
   };
+  if (middlewares && middlewares.length)
+    return applyMiddleware(store, middlewares);
+  return store;
 };
 
 export default createStore;
